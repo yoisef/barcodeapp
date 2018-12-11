@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
+import android.hardware.camera2.CameraDevice;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -41,11 +42,13 @@ public class Camera_activity extends AppCompatActivity {
 
     private SurfaceView cameraView;
     private customer.barcode.barcodewebx.CameraSource cameraSource;
+    CameraSource mycamerasource;
     private android.app.AlertDialog.Builder builder;
     private android.app.AlertDialog alertDialog;
     private Button cancel;
     private FrameLayout myframe;
     private MediaPlayer ring;
+    private View leaser;
     private android.hardware.Camera camera = null;
     boolean flashmode = false;
     Boolean result;
@@ -58,6 +61,10 @@ public class Camera_activity extends AppCompatActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera_activity);
+
+        leaser=findViewById(R.id.leaserline);
+
+
 
 
 
@@ -168,7 +175,7 @@ public class Camera_activity extends AppCompatActivity {
         }
     }
 
-    @SuppressLint("WrongConstant")
+
     public void instalcamerawithflash()
  {
 
@@ -192,7 +199,8 @@ public class Camera_activity extends AppCompatActivity {
      cameraSource = new customer.barcode.barcodewebx.CameraSource
              .Builder(Camera_activity.this, detector)
              .setRequestedPreviewSize(640, 480)
-             .setFocusMode(Camera.Parameters.SCENE_MODE_BARCODE)
+             .setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)
+             .setscanmode( Camera.Parameters.SCENE_MODE_BARCODE)
              .setFlashMode(Camera.Parameters.FLASH_MODE_TORCH)
              .build();
 
@@ -217,6 +225,8 @@ public class Camera_activity extends AppCompatActivity {
                      return;
                  }
                  cameraSource.start(cameraView.getHolder());
+
+
 
              } catch (IOException ie) {
                  Log.e("CAMERA SOURCE", ie.getMessage());
@@ -253,6 +263,7 @@ public class Camera_activity extends AppCompatActivity {
                      public void run() {
 
                          changelay.setVisibility(View.VISIBLE);
+                         leaser.setVisibility(View.GONE);
                          cameraView.setBackground(getResources().getDrawable(R.drawable.camerashapedark));
                          ring.start();
                          Intent myintent=new Intent();
@@ -273,7 +284,7 @@ public class Camera_activity extends AppCompatActivity {
 
 
  }
- @SuppressLint("WrongConstant")
+
  public void instalcamerawirhoutflash()
  {
 
@@ -297,7 +308,8 @@ public class Camera_activity extends AppCompatActivity {
      cameraSource = new customer.barcode.barcodewebx.CameraSource
              .Builder(Camera_activity.this, detector)
              .setRequestedPreviewSize(640, 480)
-             .setFocusMode( Camera.Parameters.SCENE_MODE_BARCODE)
+             .setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)
+             .setscanmode(Camera.Parameters.SCENE_MODE_BARCODE)
              .build();
 
 
@@ -339,6 +351,7 @@ public class Camera_activity extends AppCompatActivity {
 //             cameraSource.release();
          }
      });
+
 
      detector.setProcessor(new Detector.Processor<Barcode>() {
          @Override

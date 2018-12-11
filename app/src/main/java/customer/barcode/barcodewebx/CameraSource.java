@@ -84,6 +84,7 @@ public class CameraSource {
             Camera.Parameters.FOCUS_MODE_FIXED,
             Camera.Parameters.FOCUS_MODE_INFINITY,
             Camera.Parameters.FOCUS_MODE_MACRO
+
     })
     @Retention(RetentionPolicy.SOURCE)
     private @interface FocusMode {}
@@ -97,6 +98,13 @@ public class CameraSource {
     })
     @Retention(RetentionPolicy.SOURCE)
     private @interface FlashMode {}
+
+    @StringDef({
+            Camera.Parameters.SCENE_MODE_BARCODE,
+            Camera.Parameters.SCENE_MODE_HDR
+    })
+    @Retention(RetentionPolicy.SOURCE)
+    private @interface Scenemode {}
 
     private Context mContext;
 
@@ -124,6 +132,7 @@ public class CameraSource {
 
     private String mFocusMode = null;
     private String mFlashMode = null;
+    private String mscanMode = null;
 
     // These instances need to be held onto to avoid GC of their underlying resources.  Even though
     // these aren't used outside of the method that creates them, they still must have hard
@@ -184,6 +193,8 @@ public class CameraSource {
             return this;
         }
 
+
+
         public Builder setFocusMode(@FocusMode String mode) {
             mCameraSource.mFocusMode = mode;
             return this;
@@ -192,6 +203,15 @@ public class CameraSource {
         public Builder setFlashMode(@FlashMode String mode) {
             mCameraSource.mFlashMode = mode;
             return this;
+        }
+
+        public Builder setscanmode(@Scenemode String value)
+        {
+            mCameraSource.mscanMode=value;
+
+
+            return this;
+
         }
 
         /**
@@ -533,6 +553,48 @@ public class CameraSource {
             return false;
         }
     }
+
+    /**
+     * Gets the current scene mode setting.
+     *
+     * @return current scene mode. null if flash mode setting is not
+     * supported or the camera is not yet created.
+     * @see Camera.Parameters#SCENE_MODE_BARCODE
+     * @see Camera.Parameters#SCENE_MODE_HDR
+
+     */
+
+    @Nullable
+    @Scenemode
+    public String getscanmode() {
+        return mFocusMode;
+    }
+
+    /**
+     * Sets the focus mode.
+     *
+     * @param value the scene mode
+     * @return {@code true} if the focus mode is set, {@code false} otherwise
+     * @see #getscanmode()
+     */
+
+    public boolean setsceneMode(@Scenemode String value) {
+
+        synchronized (mCameraLock) {
+            if (mCamera != null && value != null) {
+                Camera.Parameters parameters = mCamera.getParameters();
+                if (parameters.getSupportedSceneModes().contains(value)) {
+                    parameters.setSceneMode(value);
+                    mCamera.setParameters(parameters);
+                    mscanMode = value;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
 
     /**
      * Gets the current flash mode setting.
